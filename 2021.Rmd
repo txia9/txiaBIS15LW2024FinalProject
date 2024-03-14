@@ -1,7 +1,8 @@
 ---
-title: '2021'
-output: html_document
+title: "2021 Group Project"
+author: "MOHIT BADHAN"
 date: "2024-03-09"
+output: html_notebook
 runtime: shiny
 ---
 
@@ -9,6 +10,54 @@ runtime: shiny
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+# BIS15W24 
+
+#Mohit & Tian
+
+
+# Introduction
+
+We will be using data published on Kaggle. The data comes from a spreadsheet with information. The data contains 7 csv files from 2015 to 2022 ranking happiness across different regions and countries in the world. 
+
+In our project we will focus on the 2021 csv file.
+
+
+# The World Happiness Report
+The data is collected by The World Happiness Report which surveys bliss. The report gains worldwide acknowledgment as organizations and governments utilize reports such as this one to influence their policy-making decisions. It is a national average of the responses to the main life evaluation question asked in the Gallup World Poll, which uses the Cantril Ladder.
+
+
+The reports survey the state of bliss within the world nowadays and appear how the modern science of bliss clarifies variation between the regions of the world. 
+
+
+The 2021 data that we use in our project utilize a Happiness score which is explained by GDP per capita, Healthy Life Expectancy, Social Support, Freedom to make life choices, etc. 
+
+
+Our project aims to show the data in a more presentable fashion by including ranges and certain values of countries. 
+
+
+# Cleaning the data
+
+## Names: 
+Janitor work
+
+## Removing variables: 
+All variables remained but were not utilized on graphs.
+
+## Joins 
+None of the other csv files were joined with 2021 as the column names were not similar and R was not allowing us to. 
+
+## Happiest Country: Finland
+
+## Highest GDP Country: Luxembourg
+
+
+
+## Sources
+
+https://www.kaggle.com/datasets/mathurinache/world-happiness-report/data?select=2021.csv
+
+Presentation
 
 ```{r}
 library("dplyr")
@@ -20,10 +69,164 @@ library("shiny")
 library("shinydashboard")
 ```
 
-#Import data.   
 ```{r}
-happy <- read.csv("data/archive/2021.csv") %>% clean_names()
+happy <- read_csv("dataa/2021.csv") %>% clean_names()
+happy
 ```
+
+
+### ANY NA's
+
+```{r}
+anyNA(happy)
+```
+
+### Number of countries per region
+
+```{r}
+table(happy$regional_indicator)
+```
+Total of 149 countries with 10 regions!
+
+
+```{r}
+happy %>%
+  group_by(regional_indicator) %>%
+  summarize(mean_happiness=mean(ladder_score, na.rm=T)) %>%
+  ggplot(aes(x=regional_indicator, y=mean_happiness, fill=regional_indicator))+ 
+  geom_col()+
+  coord_flip()
+```
+
+Western Europe, North America and ANZ, and Central and Eastern Europe rank the highest in ladder scores (happiness)!
+
+Sub-Saharan Africa, South Asia, and Middle East and North Africa rank the lowest in ladder scores (happiness)!
+
+```{r}
+happy %>%
+  group_by(regional_indicator) %>%
+  summarize(mean_gdp=mean(logged_gdp_per_capita, na.rm=T)) %>%
+  ggplot(aes(x=regional_indicator, y=mean_gdp, fill=regional_indicator))+ 
+  geom_col()+
+  coord_flip()
+```
+
+Western Europe, North America and ANZ, and East Asia rank the highest in logged GDP per capita (economy)!
+
+Sub-Saharan Africa, South Asia, and Latin America and Carribean rank the lowest in logged GDP per capita (economy)!
+
+```{r}
+happy %>%
+  group_by(regional_indicator) %>%
+  summarize(mean_life_expectancy=mean(healthy_life_expectancy, na.rm=T)) %>%
+  ggplot(aes(x=regional_indicator, y=mean_life_expectancy, fill=regional_indicator))+ 
+  geom_col()+
+  coord_flip()
+```
+
+Western Europe, North America and ANZ, and East Asia rank the highest in mean healthy life expectancy!
+
+Sub-Saharan Africa, South Asia, and Commonwealth of Independent States rank the lowest in mean healthy life expectancy!
+
+
+```{r}
+happy %>%
+  group_by(regional_indicator) %>%
+  summarize(mean_socialsupport=mean(social_support, na.rm=T)) %>%
+  ggplot(aes(x=regional_indicator, y=mean_socialsupport, fill=regional_indicator))+ 
+  geom_col()+
+  coord_flip()
+```
+
+Western Europe, North America and ANZ, and Central and Eastern Europe rank the highest in mean social support!
+
+Sub-Saharan Africa, South Asia, and Middle East and North Africa rank the lowest in mean  mean social support!
+
+Highest Ladder Score 
+
+```{r}
+happy %>%
+  select(country_name, ladder_score) %>%
+  arrange(desc(ladder_score))
+```
+
+Lowest Ladder Score 
+
+```{r}
+happy %>%
+  select(country_name, ladder_score) %>%
+  arrange(ladder_score)
+```
+
+Top 5 Countries for Life Expectancy
+
+```{r}
+happy %>%
+  select(country_name, healthy_life_expectancy) %>%
+  arrange(desc(healthy_life_expectancy))
+```
+
+Lowest 5 Countries for Life Expectancy
+
+```{r}
+happy %>%
+  select(country_name, healthy_life_expectancy) %>%
+  arrange(healthy_life_expectancy)
+```
+
+
+Highest/Lowest 5 Countries for logged_gdp_per_capita
+
+```{r}
+happy %>%
+  select(country_name, logged_gdp_per_capita) %>%
+  arrange(desc(logged_gdp_per_capita))
+```
+
+```{r}
+happy %>%
+  select(country_name,logged_gdp_per_capita) %>%
+  arrange((logged_gdp_per_capita))
+```
+
+
+
+Range of Freedom to Make Life Choices by Region
+
+```{r}
+happy %>% 
+  ggplot(aes(x=regional_indicator, y=freedom_to_make_life_choices, fill=regional_indicator))+
+  geom_boxplot()+
+  coord_flip()+
+  scale_y_log10()+
+  labs(title="Observations by Region",
+       x="Region",
+       y="Freedom")
+```
+
+```{r}
+happy %>%
+  filter(country_name=="Finland") %>%
+  select(ladder_score, logged_gdp_per_capita, healthy_life_expectancy, social_support)
+```
+
+```{r}
+happy %>%
+  filter(country_name=="United States") %>%
+  select(ladder_score, logged_gdp_per_capita, healthy_life_expectancy, social_support) 
+```
+
+
+
+```{r}
+happy %>%
+  filter(country_name=="Afghanistan") %>%
+  select(ladder_score, logged_gdp_per_capita, healthy_life_expectancy, social_support) 
+```
+
+
+These data sets are used to show that not one individual variable is used to assess the countries happiness based off of their ladder score, for instance the U.S. has a higher logged GDP per capita but ranks lower than Finland in the ladder score, life expectancy, and social support! 
+
 
 #UI as scatter plot of all comparable variable by region.  
 ```{r}
@@ -81,7 +284,6 @@ server <- function(input, output, session) {
 
 shinyApp(ui, server)
 ```
-
 
 
 
