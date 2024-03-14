@@ -1,4 +1,4 @@
-# BIS15W2024_txia
+# This is the final project of group 3 by Mohit and Tian for BIS 15L class. 
 
 Welcome! This final presentation repository by Tian Xia and Mohit Badhan as BIS 15L students at UC Davis. 
 
